@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام الفؤاد ERP - نسخة تجريبية</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap');
+        * { font-family: 'Cairo', sans-serif; }
+        .sidebar-link.active { background: #2563eb; color: white; }
+        .modal { display: none; }
+        .modal.active { display: flex; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- شاشة الدخول -->
+    <div id="login-screen" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 to-blue-700">
+        <div class="bg-white rounded-lg shadow-2xl p-8 w-full max-w-md">
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">نظام الفؤاد ERP</h1>
+                <p class="text-gray-600">نظام إدارة المقاولات والإنشاءات</p>
+            </div>
+            <form onsubmit="login(event)" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">اسم المستخدم</label>
+                    <input type="text" id="username" value="admin" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">كلمة المرور</label>
+                    <input type="password" id="password" value="admin123" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
+                </div>
+                <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 font-semibold">تسجيل الدخول</button>
+            </form>
+            <p class="text-center text-sm text-gray-500 mt-4">اسم المستخدم: admin / كلمة المرور: admin123</p>
+        </div>
+    </div>
+
+    <!-- التطبيق الرئيسي -->
+    <div id="app" class="hidden">
+        <header class="bg-white shadow-sm border-b fixed top-0 right-0 left-0 z-40 h-16">
+            <div class="flex items-center justify-between h-full px-6">
+                <div class="flex items-center gap-4">
+                    <h2 class="text-xl font-bold text-blue-600">نظام الفؤاد ERP</h2>
+                </div>
+                <div class="flex items-center gap-4">
+                    <span class="text-sm text-gray-700">مرحباً، مدير النظام</span>
+                    <button onclick="logout()" class="text-sm text-red-600 hover:text-red-700">تسجيل الخروج</button>
+                </div>
+            </div>
+        </header>
+
+        <aside class="fixed right-0 top-16 h-[calc(100vh-4rem)] w-64 bg-white border-l shadow-sm overflow-y-auto">
+            <nav class="p-4 space-y-1">
+                <button onclick="showPage('dashboard')" class="sidebar-link w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 active">
+                    <i data-lucide="home" class="w-5 h-5"></i>
+                    <span>لوحة التحكم</span>
+                </button>
+                <button onclick="showPage('projects')" class="sidebar-link w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100">
+                    <i data-lucide="folder-kanban" class="w-5 h-5"></i>
+                    <span>إدارة المشروعات</span>
+                </button>
+                <button onclick="showPage('contracts')" class="sidebar-link w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100">
+                    <i data-lucide="file-text" class="w-5 h-5"></i>
+                    <span>العقود وأوامر التغيير</span>
+                </button>
+                <button onclick="showPage('boq')" class="sidebar-link w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100">
+                    <i data-lucide="list" class="w-5 h-5"></i>
+                    <span>جدول بنود الأعمال</span>
+                </button>
+                <button onclick="showPage('certificates')" class="sidebar-link w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100">
+                    <i data-lucide="file-check" class="w-5 h-5"></i>
+                    <span>المستخلصات</span>
+                </button>
+                <button onclick="showPage('purchases')" class="sidebar-link w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100">
+                    <i data-lucide="shopping-cart" class="w-5 h-5"></i>
+                    <span>المشتريات</span>
+                </button>
+                <button onclick="showPage('inventory')" class="sidebar-link w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100">
+                    <i data-lucide="package" class="w-5 h-5"></i>
+                    <span>المخزون</span>
+                </button>
+                <button onclick="showPage('contractors')" class="sidebar-link w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100">
+                    <i data-lucide="users" class="w-5 h-5"></i>
+                    <span>المقاولون</span>
+                </button>
+                <button onclick="showPage('clients')" class="sidebar-link w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100">
+                    <i data-lucide="user-check" class="w-5 h-5"></i>
+                    <span>العملاء</span>
+                </button>
+                <button onclick="showPage('accounting')" class="sidebar-link w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100">
+                    <i data-lucide="calculator" class="w-5 h-5"></i>
+                    <span>الحسابات العامة</span>
+                </button>
+                <button onclick="showPage('advances')" class="sidebar-link w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100">
+                    <i data-lucide="wallet" class="w-5 h-5"></i>
+                    <span>العهد والسلف</span>
+                </button>
+                <button onclick="showPage('reports')" class="sidebar-link w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100">
+                    <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
+                    <span>التقارير</span>
+                </button>
+                <button onclick="showPage('users')" class="sidebar-link w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100">
+                    <i data-lucide="shield" class="w-5 h-5"></i>
+                    <span>المستخدمون والصلاحيات</span>
+                </button>
+                <button onclick="showPage('settings')" class="sidebar-link w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100">
+                    <i data-lucide="settings" class="w-5 h-5"></i>
+                    <span>الإعدادات</span>
+                </button>
+            </nav>
+        </aside>
+
+        <main class="mr-64 pt-16 min-h-screen">
+            <div class="p-6">
+                <!-- Dashboard -->
+                <div id="page-dashboard" class="page">
+                    <h1 class="text-2xl font-bold mb-6">لوحة التحكم</h1>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                        <div class="bg-white p-4 rounded-lg shadow"><p class="text-sm text-gray-500">المشاريع النشطة</p><p class="text-2xl font-bold">5</p></div>
+                        <div class="bg-white p-4 rounded-lg shadow"><p class="text-sm text-gray-500">قيمة العقود</p><p class="text-2xl font-bold">12,500,000 ج.م</p></div>
+                        <div class="bg-white p-4 rounded-lg shadow"><p class="text-sm text-gray-500">المستخلصات قيد الاعتماد</p><p class="text-2xl font-bold">3</p></div>
+                        <div class="bg-white p-4 rounded-lg shadow"><p class="text-sm text-gray-500">رصيد الخزينة</p><p class="text-2xl font-bold">850,000 ج.م</p></div>
+                    </div>
+                </div>
+
+                <!-- Projects -->
+                <div id="page-projects" class="page hidden">
+                    <div class="flex justify-between mb-6">
+                        <h1 class="text-2xl font-bold">إدارة المشروعات</h1>
+                        <button onclick="openModal('modal-project')" class="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"><i data-lucide="plus" class="w-4 h-4"></i> مشروع جديد</button>
+                    </div>
+                    <div class="bg-white rounded-lg shadow overflow-hidden">
+                        <table class="w-full">
+                            <thead class="bg-gray-50"><tr><th class="px-6 py-3 text-right">الكود</th><th class="px-6 py-3 text-right">اسم المشروع</th><th class="px-6 py-3 text-right">العميل</th><th class="px-6 py-3 text-right">قيمة العقد</th><th class="px-6 py-3 text-right">الحالة</th><th class="px-6 py-3 text-right">إجراءات</th></tr></thead>
+                            <tbody id="projects-tbody"><tr><td class="px-6 py-4">PRJ-001</td><td class="px-6 py-4">مشروع مجمع سكني</td><td class="px-6 py-4">أحمد محمد</td><td class="px-6 py-4">4,500,000 ج.م</td><td class="px-6 py-4"><span class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">تنفيذ</span></td><td class="px-6 py-4"><button class="text-blue-600 ml-2"><i data-lucide="eye" class="w-4 h-4"></i></button><button class="text-gray-600 ml-2"><i data-lucide="edit" class="w-4 h-4"></i></button><button onclick="showPage('boq')" class="text-green-600"><i data-lucide="file-text" class="w-4 h-4"></i></button></td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Contracts -->
+                <div id="page-contracts" class="page hidden">
+                    <div class="flex justify-between mb-6">
+                        <h1 class="text-2xl font-bold">العقود وأوامر التغيير</h1>
+                        <div class="flex gap-2">
+                            <button onclick="openModal('modal-contract')" class="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"><i data-lucide="plus" class="w-4 h-4"></i> عقد جديد</button>
+                            <button onclick="openModal('modal-change')" class="bg-orange-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"><i data-lucide="plus" class="w-4 h-4"></i> أمر تغيير جديد</button>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow overflow-hidden mb-6">
+                        <div class="px-6 py-4 border-b"><h2 class="font-semibold">العقود</h2></div>
+                        <table class="w-full"><thead class="bg-gray-50"><tr><th class="px-6 py-3 text-right">رقم العقد</th><th class="px-6 py-3 text-right">المشروع</th><th class="px-6 py-3 text-right">النوع</th><th class="px-6 py-3 text-right">الطرف الآخر</th><th class="px-6 py-3 text-right">القيمة</th><th class="px-6 py-3 text-right">إجراءات</th></tr></thead>
+                        <tbody><tr><td class="px-6 py-4">CNT-001</td><td class="px-6 py-4">مشروع مجمع سكني</td><td class="px-6 py-4">عقد عميل</td><td class="px-6 py-4">أحمد محمد</td><td class="px-6 py-4">4,500,000 ج.م</td><td class="px-6 py-4"><button class="text-blue-600 ml-2"><i data-lucide="eye" class="w-4 h-4"></i></button><button onclick="openModal('modal-contract-edit')" class="text-gray-600 ml-2"><i data-lucide="edit" class="w-4 h-4"></i></button><button class="text-orange-600"><i data-lucide="file-plus" class="w-4 h-4"></i></button></td></tr></tbody></table>
+                    </div>
+                </div>
+
+                <!-- BOQ -->
+                <div id="page-boq" class="page hidden">
+                    <div class="flex justify-between mb-6">
+                        <h1 class="text-2xl font-bold">جدول بنود الأعمال (BOQ)</h1>
+                        <div class="flex gap-2">
+                            <button onclick="openModal('modal-boq')" class="bg-white border px-4 py-2 rounded-lg flex items-center gap-2"><i data-lucide="plus" class="w-4 h-4"></i> إضافة بند</button>
+                            <button onclick="alert('تم الحفظ')" class="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"><i data-lucide="save" class="w-4 h-4"></i> حفظ</button>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow overflow-hidden">
+                        <table class="w-full"><thead class="bg-gray-50"><tr><th class="px-4 py-3 text-right">كود البند</th><th class="px-4 py-3 text-right">الوصف</th><th class="px-4 py-3 text-right">الوحدة</th><th class="px-4 py-3 text-right">الكمية</th><th class="px-4 py-3 text-right">سعر الوحدة</th><th class="px-4 py-3 text-right">القيمة</th><th class="px-4 py-3 text-right">إجراءات</th></tr></thead>
+                        <tbody><tr><td class="px-4 py-3">01.01</td><td class="px-4 py-3">أعمال الحفر</td><td class="px-4 py-3">م³</td><td class="px-4 py-3">150</td><td class="px-4 py-3">45</td><td class="px-4 py-3 font-semibold">6,750 ج.م</td><td class="px-4 py-3"><button class="text-blue-600 ml-2"><i data-lucide="edit" class="w-4 h-4"></i></button><button class="text-red-600"><i data-lucide="trash-2" class="w-4 h-4"></i></button></td></tr></tbody>
+                        <tfoot class="bg-gray-50"><tr><td colspan="6" class="px-4 py-3 font-bold">إجمالي قيمة العقد</td><td class="px-4 py-3 font-bold">6,750 ج.م</td></tr></tfoot></table>
+                    </div>
+                </div>
+
+                <!-- Certificates -->
+                <div id="page-certificates" class="page hidden">
+                    <div class="flex justify-between mb-6">
+                        <h1 class="text-2xl font-bold">المستخلصات</h1>
+                        <button onclick="openModal('modal-cert')" class="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"><i data-lucide="plus" class="w-4 h-4"></i> مستخلص جديد</button>
+                    </div>
+                    <div class="bg-white rounded-lg shadow overflow-hidden mb-6">
+                        <table class="w-full"><thead class="bg-gray-50"><tr><th class="px-6 py-3 text-right">رقم المستخلص</th><th class="px-6 py-3 text-right">المشروع</th><th class="px-6 py-3 text-right">أعمال الفترة</th><th class="px-6 py-3 text-right">صافي المستحق</th><th class="px-6 py-3 text-right">الحالة</th><th class="px-6 py-3 text-right">إجراءات</th></tr></thead>
+                        <tbody><tr><td class="px-6 py-4">CERT-001</td><td class="px-6 py-4">مشروع مجمع سكني</td><td class="px-6 py-4">200,000 ج.م</td><td class="px-6 py-4 font-semibold text-green-600">170,000 ج.م</td><td class="px-6 py-4"><span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs">مقدم</span></td><td class="px-6 py-4"><button onclick="alert('عرض تفاصيل المستخلص')" class="text-blue-600 ml-2"><i data-lucide="eye" class="w-4 h-4"></i></button><button onclick="alert('تم الاعتماد')" class="text-green-600 ml-2"><i data-lucide="check-circle" class="w-4 h-4"></i></button><button onclick="alert('تم الدفع')" class="text-purple-600 ml-2"><i data-lucide="file-text" class="w-4 h-4"></i></button><button onclick="if(confirm('رفض المستخلص؟')) alert('تم الرفض')" class="text-red-600"><i data-lucide="x-circle" class="w-4 h-4"></i></button></td></tr></tbody></table>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h2 class="text-lg font-semibold mb-4">حاسبة المستخلص السريعة</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                            <div><label class="block text-sm mb-1">أعمال الفترة</label><input type="number" id="calc-work" oninput="calcCert()" class="w-full px-3 py-2 border rounded-lg"></div>
+                            <div><label class="block text-sm mb-1">استرداد دفعة مقدمة (%)</label><input type="number" id="calc-adv" value="10" oninput="calcCert()" class="w-full px-3 py-2 border rounded-lg"></div>
+                            <div><label class="block text-sm mb-1">الاحتفاظ (%)</label><input type="number" id="calc-ret" value="5" oninput="calcCert()" class="w-full px-3 py-2 border rounded-lg"></div>
+                            <div><label class="block text-sm mb-1">خصومات أخرى</label><input type="number" id="calc-ded" oninput="calcCert()" class="w-full px-3 py-2 border rounded-lg"></div>
+                            <div><label class="block text-sm mb-1">صافي المستحق</label><input type="text" id="calc-net" readonly class="w-full px-3 py-2 border rounded-lg bg-green-50 font-semibold"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Purchases -->
+                <div id="page-purchases" class="page hidden">
+                    <div class="flex justify-between mb-6"><h1 class="text-2xl font-bold">المشتريات</h1><button onclick="openModal('modal-po')" class="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"><i data-lucide="plus" class="w-4 h-4"></i> طلب شراء جديد</button></div>
+                    <div class="bg-white rounded-lg shadow overflow-hidden">
+                        <table class="w-full"><thead class="bg-gray-50"><tr><th class="px-6 py-3 text-right">رقم الأمر</th><th class="px-6 py-3 text-right">المورد</th><th class="px-6 py-3 text-right">التاريخ</th><th class="px-6 py-3 text-right">الإجمالي</th><th class="px-6 py-3 text-right">الحالة</th></tr></thead>
+                        <tbody><tr><td class="px-6 py-4">PO-001</td><td class="px-6 py-4">مورد الأسمنت</td><td class="px-6 py-4">2026-10-28</td><td class="px-6 py-4">150,000 ج.م</td><td class="px-6 py-4"><span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">معتمد</span></td></tr></tbody></table>
+                    </div>
+                </div>
+
+                <!-- Contractors -->
+                <div id="page-contractors" class="page hidden">
+                    <div class="flex justify-between mb-6"><h1 class="text-2xl font-bold">المقاولون</h1><button onclick="openModal('modal-contractor')" class="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"><i data-lucide="plus" class="w-4 h-4"></i> مقاول جديد</button></div>
+                    <div class="bg-white rounded-lg shadow overflow-hidden">
+                        <table class="w-full"><thead class="bg-gray-50"><tr><th class="px-6 py-3 text-right">الكود</th><th class="px-6 py-3 text-right">اسم المقاول</th><th class="px-6 py-3 text-right">التليفون</th><th class="px-6 py-3 text-right">الرصيد</th><th class="px-6 py-3 text-right">إجراءات</th></tr></thead>
+                        <tbody><tr><td class="px-6 py-4">CON-001</td><td class="px-6 py-4">مؤسسة البناء الحديث</td><td class="px-6 py-4">01012345678</td><td class="px-6 py-4">0 ج.م</td><td class="px-6 py-4"><button class="text-blue-600 ml-2"><i data-lucide="eye" class="w-4 h-4"></i></button><button class="text-gray-600"><i data-lucide="edit" class="w-4 h-4"></i></button></td></tr></tbody></table>
+                    </div>
+                </div>
+
+                <!-- Clients -->
+                <div id="page-clients" class="page hidden">
+                    <div class="flex justify-between mb-6"><h1 class="text-2xl font-bold">العملاء</h1><button onclick="openModal('modal-client')" class="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"><i data-lucide="plus" class="w-4 h-4"></i> عميل جديد</button></div>
+                    <div class="bg-white rounded-lg shadow overflow-hidden">
+                        <table class="w-full"><thead class="bg-gray-50"><tr><th class="px-6 py-3 text-right">الكود</th><th class="px-6 py-3 text-right">اسم العميل</th><th class="px-6 py-3 text-right">التليفون</th><th class="px-6 py-3 text-right">الرصيد</th><th class="px-6 py-3 text-right">إجراءات</th></tr></thead>
+                        <tbody><tr><td class="px-6 py-4">CL-001</td><td class="px-6 py-4">أحمد محمد</td><td class="px-6 py-4">01098765432</td><td class="px-6 py-4">0 ج.م</td><td class="px-6 py-4"><button class="text-blue-600 ml-2"><i data-lucide="eye" class="w-4 h-4"></i></button><button class="text-gray-600"><i data-lucide="edit" class="w-4 h-4"></i></button></td></tr></tbody></table>
+                    </div>
+                </div>
+
+                <!-- Accounting -->
+                <div id="page-accounting" class="page hidden">
+                    <h1 class="text-2xl font-bold mb-6">الحسابات العامة</h1>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <button onclick="alert('دليل الحسابات')" class="bg-white p-6 rounded-lg shadow text-right hover:shadow-md"><h3 class="font-semibold text-lg mb-2">دليل الحسابات</h3><p class="text-sm text-gray-500">إدارة شجرة الحسابات</p></button>
+                        <button onclick="openModal('modal-journal')" class="bg-white p-6 rounded-lg shadow text-right hover:shadow-md"><h3 class="font-semibold text-lg mb-2">قيود اليومية</h3><p class="text-sm text-gray-500">إضافة وتعديل وترحيل القيود</p></button>
+                        <button onclick="alert('دفتر الأستاذ العام')" class="bg-white p-6 rounded-lg shadow text-right hover:shadow-md"><h3 class="font-semibold text-lg mb-2">دفتر الأستاذ العام</h3><p class="text-sm text-gray-500">حركة كل حساب ورصيده</p></button>
+                        <button onclick="alert('دفتر الأستاذ المساعد')" class="bg-white p-6 rounded-lg shadow text-right hover:shadow-md"><h3 class="font-semibold text-lg mb-2">دفتر الأستاذ المساعد</h3><p class="text-sm text-gray-500">العملاء والموردين والمقاولين</p></button>
+                        <button onclick="openModal('modal-cost')" class="bg-white p-6 rounded-lg shadow text-right hover:shadow-md"><h3 class="font-semibold text-lg mb-2">مراكز التكلفة</h3><p class="text-sm text-gray-500">إضافة وتعديل مراكز التكلفة</p></button>
+                        <button onclick="alert('ميزان المراجعة')" class="bg-white p-6 rounded-lg shadow text-right hover:shadow-md"><h3 class="font-semibold text-lg mb-2">ميزان المراجعة</h3><p class="text-sm text-gray-500">توازن الحسابات</p></button>
+                    </div>
+                </div>
+
+                <!-- Advances -->
+                <div id="page-advances" class="page hidden">
+                    <div class="flex justify-between mb-6"><h1 class="text-2xl font-bold">العهد والسلف</h1><button onclick="openModal('modal-advance')" class="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"><i data-lucide="plus" class="w-4 h-4"></i> طلب عهدة جديد</button></div>
+                    <div class="bg-white rounded-lg shadow overflow-hidden"><table class="w-full"><thead class="bg-gray-50"><tr><th class="px-6 py-3 text-right">رقم العهدة</th><th class="px-6 py-3 text-right">الموظف</th><th class="px-6 py-3 text-right">المبلغ</th><th class="px-6 py-3 text-right">الحالة</th></tr></thead><tbody><tr><td colspan="4" class="px-6 py-8 text-center text-gray-500">لا توجد عهدة</td></tr></tbody></table></div>
+                </div>
+
+                <!-- Reports -->
+                <div id="page-reports" class="page hidden">
+                    <h1 class="text-2xl font-bold mb-6">التقارير المالية والهندسية</h1>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <button onclick="alert('ميزان المراجعة')" class="bg-white p-6 rounded-lg shadow text-right hover:shadow-md"><h3 class="font-semibold mb-1">ميزان المراجعة</h3><p class="text-sm text-gray-500">توازن الحسابات</p></button>
+                        <button onclick="alert('قائمة الدخل')" class="bg-white p-6 rounded-lg shadow text-right hover:shadow-md"><h3 class="font-semibold mb-1">قائمة الدخل</h3><p class="text-sm text-gray-500">الإيرادات والمصروفات</p></button>
+                        <button onclick="alert('الميزانية العمومية')" class="bg-white p-6 rounded-lg shadow text-right hover:shadow-md"><h3 class="font-semibold mb-1">الميزانية العمومية</h3><p class="text-sm text-gray-500">المركز المالي</p></button>
+                        <button onclick="alert('كشف حساب المقاول')" class="bg-white p-6 rounded-lg shadow text-right hover:shadow-md"><h3 class="font-semibold mb-1">كشف حساب المقاول</h3><p class="text-sm text-gray-500">أرصدة المقاولين</p></button>
+                    </div>
+                </div>
+
+                <!-- Users -->
+                <div id="page-users" class="page hidden">
+                    <div class="flex justify-between mb-6"><h1 class="text-2xl font-bold">المستخدمون والصلاحيات</h1><button onclick="openModal('modal-user')" class="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"><i data-lucide="plus" class="w-4 h-4"></i> مستخدم جديد</button></div>
+                    <div class="bg-white rounded-lg shadow overflow-hidden">
+                        <table class="w-full"><thead class="bg-gray-50"><tr><th class="px-6 py-3 text-right">اسم المستخدم</th><th class="px-6 py-3 text-right">الاسم الكامل</th><th class="px-6 py-3 text-right">الدور</th><th class="px-6 py-3 text-right">الحالة</th></tr></thead>
+                        <tbody><tr><td class="px-6 py-4">admin</td><td class="px-6 py-4">مدير النظام</td><td class="px-6 py-4">مدير النظام</td><td class="px-6 py-4"><span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">نشط</span></td></tr></tbody></table>
+                    </div>
+                </div>
+
+                <!-- Settings -->
+                <div id="page-settings" class="page hidden">
+                    <h1 class="text-2xl font-bold mb-6">إعدادات النظام</h1>
+                    <div class="bg-white rounded-lg shadow p-6 mb-4">
+                        <h2 class="font-semibold mb-4">بيانات الشركة</h2>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div><label class="block text-sm mb-1">اسم الشركة</label><input type="text" value="شركة الفؤاد للمقاولات والإنشاءات" class="w-full px-3 py-2 border rounded-lg"></div>
+                            <div><label class="block text-sm mb-1">العملة</label><input type="text" value="ج.م" disabled class="w-full px-3 py-2 border rounded-lg bg-gray-50"></div>
+                        </div>
+                    </div>
+                    <button onclick="alert('تم الحفظ')" class="bg-blue-600 text-white px-6 py-2 rounded-lg">حفظ الإعدادات</button>
+                </div>
+
+                <!-- Inventory -->
+                <div id="page-inventory" class="page hidden">
+                    <div class="flex justify-between mb-6"><h1 class="text-2xl font-bold">المخزون</h1><button class="bg-blue-600 text-white px-4 py-2 rounded-lg">إضافة صنف</button></div>
+                    <div class="bg-white rounded-lg shadow overflow-hidden"><table class="w-full"><thead class="bg-gray-50"><tr><th class="px-6 py-3 text-right">كود الصنف</th><th class="px-6 py-3 text-right">اسم الصنف</th><th class="px-6 py-3 text-right">الرصيد</th><th class="px-6 py-3 text-right">الوحدة</th></tr></thead><tbody><tr><td colspan="4" class="px-6 py-8 text-center text-gray-500">لا توجد أصناف</td></tr></tbody></table></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <div id="modal-project" class="modal fixed inset-0 bg-black/50 items-center justify-center z-50">
+        <div class="bg-white rounded-lg w-full max-w-md p-6">
+            <div class="flex justify-between mb-4"><h3 class="text-lg font-bold">إضافة مشروع جديد</h3><button onclick="closeModal('modal-project')"><i data-lucide="x"></i></button></div>
+            <div class="space-y-3">
+                <input type="text" placeholder="اسم المشروع" class="w-full px-3 py-2 border rounded-lg">
+                <input type="text" placeholder="العميل" class="w-full px-3 py-2 border rounded-lg">
+                <input type="number" placeholder="قيمة العقد" class="w-full px-3 py-2 border rounded-lg">
+                <button onclick="alert('تم الإضافة'); closeModal('modal-project')" class="w-full bg-blue-600 text-white py-2 rounded-lg">حفظ</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-contract" class="modal fixed inset-0 bg-black/50 items-center justify-center z-50">
+        <div class="bg-white rounded-lg w-full max-w-md p-6">
+            <div class="flex justify-between mb-4"><h3 class="text-lg font-bold">إضافة عقد جديد</h3><button onclick="closeModal('modal-contract')"><i data-lucide="x"></i></button></div>
+            <div class="space-y-3">
+                <input type="text" placeholder="المشروع" class="w-full px-3 py-2 border rounded-lg">
+                <select class="w-full px-3 py-2 border rounded-lg"><option>عقد عميل</option><option>عقد مقاول باطن</option></select>
+                <input type="text" placeholder="الطرف الآخر" class="w-full px-3 py-2 border rounded-lg">
+                <input type="number" placeholder="القيمة الأصلية" class="w-full px-3 py-2 border rounded-lg">
+                <button onclick="alert('تم الإضافة'); closeModal('modal-contract')" class="w-full bg-blue-600 text-white py-2 rounded-lg">حفظ</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-contract-edit" class="modal fixed inset-0 bg-black/50 items-center justify-center z-50">
+        <div class="bg-white rounded-lg w-full max-w-md p-6">
+            <div class="flex justify-between mb-4"><h3 class="text-lg font-bold">تعديل العقد</h3><button onclick="closeModal('modal-contract-edit')"><i data-lucide="x"></i></button></div>
+            <div class="space-y-3">
+                <input type="text" value="CNT-001" class="w-full px-3 py-2 border rounded-lg">
+                <input type="text" value="مشروع مجمع سكني" class="w-full px-3 py-2 border rounded-lg">
+                <input type="text" value="أحمد محمد" class="w-full px-3 py-2 border rounded-lg">
+                <input type="number" value="4500000" class="w-full px-3 py-2 border rounded-lg">
+                <button onclick="alert('تم التعديل'); closeModal('modal-contract-edit')" class="w-full bg-blue-600 text-white py-2 rounded-lg">حفظ التعديل</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-change" class="modal fixed inset-0 bg-black/50 items-center justify-center z-50">
+        <div class="bg-white rounded-lg w-full max-w-md p-6">
+            <div class="flex justify-between mb-4"><h3 class="text-lg font-bold">أمر تغيير جديد</h3><button onclick="closeModal('modal-change')"><i data-lucide="x"></i></button></div>
+            <div class="space-y-3">
+                <select class="w-full px-3 py-2 border rounded-lg"><option>CNT-001 - مشروع مجمع سكني</option></select>
+                <input type="text" placeholder="سبب التغيير" class="w-full px-3 py-2 border rounded-lg">
+                <input type="number" placeholder="المبلغ الإضافي" class="w-full px-3 py-2 border rounded-lg">
+                <input type="date" class="w-full px-3 py-2 border rounded-lg">
+                <button onclick="alert('تم الإضافة'); closeModal('modal-change')" class="w-full bg-orange-600 text-white py-2 rounded-lg">حفظ</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-boq" class="modal fixed inset-0 bg-black/50 items-center justify-center z-50">
+        <div class="bg-white rounded-lg w-full max-w-md p-6">
+            <div class="flex justify-between mb-4"><h3 class="text-lg font-bold">إضافة بند جديد</h3><button onclick="closeModal('modal-boq')"><i data-lucide="x"></i></button></div>
+            <div class="space-y-3">
+                <input type="text" placeholder="وصف البند" class="w-full px-3 py-2 border rounded-lg">
+                <select class="w-full px-3 py-2 border rounded-lg"><option>م³</option><option>م²</option><option>م</option><option>عدد</option></select>
+                <input type="number" placeholder="الكمية" class="w-full px-3 py-2 border rounded-lg">
+                <input type="number" placeholder="سعر الوحدة" class="w-full px-3 py-2 border rounded-lg">
+                <button onclick="alert('تم الإضافة'); closeModal('modal-boq')" class="w-full bg-blue-600 text-white py-2 rounded-lg">حفظ</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-cert" class="modal fixed inset-0 bg-black/50 items-center justify-center z-50">
+        <div class="bg-white rounded-lg w-full max-w-md p-6">
+            <div class="flex justify-between mb-4"><h3 class="text-lg font-bold">إضافة مستخلص جديد</h3><button onclick="closeModal('modal-cert')"><i data-lucide="x"></i></button></div>
+            <div class="space-y-3">
+                <input type="text" placeholder="المشروع" class="w-full px-3 py-2 border rounded-lg">
+                <input type="text" placeholder="الفترة" class="w-full px-3 py-2 border rounded-lg">
+                <input type="number" placeholder="أعمال الفترة المعتمدة" class="w-full px-3 py-2 border rounded-lg">
+                <button onclick="alert('تم الإضافة'); closeModal('modal-cert')" class="w-full bg-blue-600 text-white py-2 rounded-lg">حفظ</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-po" class="modal fixed inset-0 bg-black/50 items-center justify-center z-50">
+        <div class="bg-white rounded-lg w-full max-w-md p-6">
+            <div class="flex justify-between mb-4"><h3 class="text-lg font-bold">طلب شراء جديد</h3><button onclick="closeModal('modal-po')"><i data-lucide="x"></i></button></div>
+            <div class="space-y-3">
+                <input type="text" placeholder="المورد" class="w-full px-3 py-2 border rounded-lg">
+                <input type="text" placeholder="المشروع" class="w-full px-3 py-2 border rounded-lg">
+                <input type="number" placeholder="الإجمالي" class="w-full px-3 py-2 border rounded-lg">
+                <input type="date" class="w-full px-3 py-2 border rounded-lg">
+                <button onclick="alert('تم الإضافة'); closeModal('modal-po')" class="w-full bg-blue-600 text-white py-2 rounded-lg">حفظ</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-contractor" class="modal fixed inset-0 bg-black/50 items-center justify-center z-50">
+        <div class="bg-white rounded-lg w-full max-w-md p-6">
+            <div class="flex justify-between mb-4"><h3 class="text-lg font-bold">إضافة مقاول جديد</h3><button onclick="closeModal('modal-contractor')"><i data-lucide="x"></i></button></div>
+            <div class="space-y-3">
+                <input type="text" placeholder="اسم المقاول" class="w-full px-3 py-2 border rounded-lg">
+                <input type="text" placeholder="رقم التليفون" class="w-full px-3 py-2 border rounded-lg">
+                <input type="text" placeholder="العنوان" class="w-full px-3 py-2 border rounded-lg">
+                <button onclick="alert('تم الإضافة'); closeModal('modal-contractor')" class="w-full bg-blue-600 text-white py-2 rounded-lg">حفظ</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-client" class="modal fixed inset-0 bg-black/50 items-center justify-center z-50">
+        <div class="bg-white rounded-lg w-full max-w-md p-6">
+            <div class="flex justify-between mb-4"><h3 class="text-lg font-bold">إضافة عميل جديد</h3><button onclick="closeModal('modal-client')"><i data-lucide="x"></i></button></div>
+            <div class="space-y-3">
+                <input type="text" placeholder="اسم العميل" class="w-full px-3 py-2 border rounded-lg">
+                <input type="text" placeholder="رقم التليفون" class="w-full px-3 py-2 border rounded-lg">
+                <button onclick="alert('تم الإضافة'); closeModal('modal-client')" class="w-full bg-blue-600 text-white py-2 rounded-lg">حفظ</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-journal" class="modal fixed inset-0 bg-black/50 items-center justify-center z-50">
+        <div class="bg-white rounded-lg w-full max-w-2xl p-6">
+            <div class="flex justify-between mb-4"><h3 class="text-lg font-bold">إضافة قيد يومية جديد</h3><button onclick="closeModal('modal-journal')"><i data-lucide="x"></i></button></div>
+            <div class="space-y-3">
+                <input type="text" placeholder="بيان القيد" class="w-full px-3 py-2 border rounded-lg">
+                <div class="grid grid-cols-4 gap-2">
+                    <input type="text" placeholder="الحساب" class="px-2 py-1 border rounded">
+                    <input type="text" placeholder="البيان" class="px-2 py-1 border rounded">
+                    <input type="number" placeholder="مدين" class="px-2 py-1 border rounded">
+                    <input type="number" placeholder="دائن" class="px-2 py-1 border rounded">
+                </div>
+                <button onclick="alert('تم حفظ القيد'); closeModal('modal-journal')" class="w-full bg-blue-600 text-white py-2 rounded-lg">حفظ القيد</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-cost" class="modal fixed inset-0 bg-black/50 items-center justify-center z-50">
+        <div class="bg-white rounded-lg w-full max-w-md p-6">
+            <div class="flex justify-between mb-4"><h3 class="text-lg font-bold">إضافة مركز تكلفة جديد</h3><button onclick="closeModal('modal-cost')"><i data-lucide="x"></i></button></div>
+            <div class="space-y-3">
+                <input type="text" placeholder="اسم مركز التكلفة" class="w-full px-3 py-2 border rounded-lg">
+                <input type="number" placeholder="الميزانية" class="w-full px-3 py-2 border rounded-lg">
+                <input type="text" placeholder="الوصف" class="w-full px-3 py-2 border rounded-lg">
+                <button onclick="alert('تم الإضافة'); closeModal('modal-cost')" class="w-full bg-blue-600 text-white py-2 rounded-lg">حفظ</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-advance" class="modal fixed inset-0 bg-black/50 items-center justify-center z-50">
+        <div class="bg-white rounded-lg w-full max-w-md p-6">
+            <div class="flex justify-between mb-4"><h3 class="text-lg font-bold">طلب عهدة جديد</h3><button onclick="closeModal('modal-advance')"><i data-lucide="x"></i></button></div>
+            <div class="space-y-3">
+                <input type="text" placeholder="الموظف" class="w-full px-3 py-2 border rounded-lg">
+                <input type="text" placeholder="المشروع" class="w-full px-3 py-2 border rounded-lg">
+                <input type="number" placeholder="المبلغ" class="w-full px-3 py-2 border rounded-lg">
+                <input type="text" placeholder="الغرض" class="w-full px-3 py-2 border rounded-lg">
+                <button onclick="alert('تم الإضافة'); closeModal('modal-advance')" class="w-full bg-blue-600 text-white py-2 rounded-lg">حفظ</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-user" class="modal fixed inset-0 bg-black/50 items-center justify-center z-50">
+        <div class="bg-white rounded-lg w-full max-w-md p-6">
+            <div class="flex justify-between mb-4"><h3 class="text-lg font-bold">إضافة مستخدم جديد</h3><button onclick="closeModal('modal-user')"><i data-lucide="x"></i></button></div>
+            <div class="space-y-3">
+                <input type="text" placeholder="اسم المستخدم" class="w-full px-3 py-2 border rounded-lg">
+                <input type="text" placeholder="الاسم الكامل" class="w-full px-3 py-2 border rounded-lg">
+                <input type="password" placeholder="كلمة المرور" class="w-full px-3 py-2 border rounded-lg">
+                <select class="w-full px-3 py-2 border rounded-lg"><option>مستخدم</option><option>محاسب</option><option>مهندس</option><option>مدير النظام</option></select>
+                <button onclick="alert('تم الإضافة'); closeModal('modal-user')" class="w-full bg-blue-600 text-white py-2 rounded-lg">حفظ</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+        
+        function login(e) {
+            e.preventDefault();
+            const user = document.getElementById('username').value;
+            const pass = document.getElementById('password').value;
+            if(user === 'admin' && pass === 'admin123') {
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('app').classList.remove('hidden');
+                lucide.createIcons();
+            } else {
+                alert('اسم المستخدم أو كلمة المرور غير صحيحة');
+            }
+        }
+        
+        function logout() {
+            document.getElementById('app').classList.add('hidden');
+            document.getElementById('login-screen').classList.remove('hidden');
+        }
+        
+        function showPage(page) {
+            document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+            document.getElementById('page-' + page).classList.remove('hidden');
+            document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            lucide.createIcons();
+        }
+        
+        function openModal(id) {
+            document.getElementById(id).classList.add('active');
+            lucide.createIcons();
+        }
+        
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+        
+        function calcCert() {
+            const work = parseFloat(document.getElementById('calc-work').value) || 0;
+            const adv = parseFloat(document.getElementById('calc-adv').value) || 0;
+            const ret = parseFloat(document.getElementById('calc-ret').value) || 0;
+            const ded = parseFloat(document.getElementById('calc-ded').value) || 0;
+            const net = work - (work * adv/100) - (work * ret/100) - ded;
+            document.getElementById('calc-net').value = net >= 0 ? net.toLocaleString('ar-EG') + ' ج.م' : '0 ج.م';
+        }
+    </script>
+</body>
+</html>
